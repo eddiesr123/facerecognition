@@ -17,7 +17,26 @@ class App extends Component {
 		imageUrl: '',
 		boxes: [],
 		route: 'signin',
-		isSignedIn: false
+		isSignedIn: false,
+		user: {
+			id: '',
+			name: '',
+			email: '',
+			entries: 0,
+			joined: ''
+		}
+	};
+
+	loadUser = (user) => {
+		this.setState({
+			user: {
+				id: user.id,
+				name: user.name,
+				email: user.email,
+				entries: user.entries,
+				joined: user.joined
+			}
+		});
 	};
 
 	calculateFaceLocation = (data) => {
@@ -36,6 +55,18 @@ class App extends Component {
 		});
 	};
 
+	calculateEntries = () => {
+		fetch('http://localhost:3000/image', {
+			method: 'put',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				id: this.state.user.id
+			})
+		})
+			.then((response) => response.json())
+			.then((entries) => this.setState(Object.assign(this.state.user, { entries })));
+	};
+
 	displayFaceBox = (boxes) => {
 		this.setState({ boxes });
 	};
@@ -46,12 +77,13 @@ class App extends Component {
 		});
 	};
 
-	onButtonSubmit = () => {
+	onPictureSubmit = () => {
 		this.setState(
 			{
 				imageUrl: this.state.input
 			},
-			() => detectFaces(this.state.imageUrl, this.calculateFaceLocation, this.displayFaceBox)
+			() =>
+				detectFaces(this.state.imageUrl, this.calculateFaceLocation, this.displayFaceBox, this.calculateEntries)
 		);
 	};
 
@@ -73,15 +105,15 @@ class App extends Component {
 	renderRoute = (route) => {
 		switch (route) {
 			case 'signin':
-				return <SignIn onRouteChange={this.onRouteChange} />;
+				return <SignIn loadUser={this.loadUser} onRouteChange={this.onRouteChange} />;
 			case 'register':
-				return <Register onRouteChange={this.onRouteChange} />;
+				return <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} />;
 			case 'home':
 				return (
 					<React.Fragment>
 						<Logo />
-						<Rank />
-						<ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
+						<Rank user={this.state.user} />
+						<ImageLinkForm onInputChange={this.onInputChange} onPictureSubmit={this.onPictureSubmit} />
 						<FaceRecognition boxes={this.state.boxes} imageUrl={this.state.imageUrl} />
 					</React.Fragment>
 				);
