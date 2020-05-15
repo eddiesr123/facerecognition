@@ -27,6 +27,8 @@ class App extends Component {
 		}
 	};
 
+	initialState = { ...this.state };
+
 	loadUser = (user) => {
 		this.setState({
 			user: {
@@ -64,7 +66,8 @@ class App extends Component {
 			})
 		})
 			.then((response) => response.json())
-			.then((entries) => this.setState(Object.assign(this.state.user, { entries })));
+			.then((entries) => this.setState(Object.assign(this.state.user, { entries })))
+			.catch(console.log);
 	};
 
 	displayFaceBox = (boxes) => {
@@ -89,9 +92,7 @@ class App extends Component {
 
 	onRouteChange = (route) => {
 		if (route === 'signin') {
-			this.setState({
-				isSignedIn: false
-			});
+			this.setState(this.initialState);
 		} else if (route === 'home') {
 			this.setState({
 				isSignedIn: true

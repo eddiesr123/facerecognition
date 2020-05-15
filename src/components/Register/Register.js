@@ -26,20 +26,25 @@ class Register extends Component {
 	};
 
 	onRegisterChange = ({ name, email, password }) => {
-		fetch('http://localhost:3000/register', {
-			method: 'post',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				name,
-				email,
-				password
+		if (name && email && password) {
+			fetch('http://localhost:3000/register', {
+				method: 'post',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					name,
+					email,
+					password
+				})
 			})
-		})
-			.then((response) => response.json())
-			.then((user) => {
-				this.props.loadUser(user);
-				this.props.onRouteChange('home');
-			});
+				.then((response) => response.json())
+				.then((user) => {
+					if (user.id) {
+						this.props.loadUser(user);
+						this.props.onRouteChange('home');
+					}
+				})
+				.catch(console.log);
+		}
 	};
 
 	render() {
