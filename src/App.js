@@ -59,7 +59,7 @@ class App extends Component {
 	};
 
 	calculateEntries = () => {
-		fetch('http://localhost:3000/image', {
+		fetch('https://quiet-sierra-25784.herokuapp.com/image', {
 			method: 'put',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -118,13 +118,15 @@ class App extends Component {
 	// };
 
 	onPictureSubmit = () => {
-		const { imageUrl, file } = this.state;
+		// const { imageUrl, file } = this.state;
+		const { imageUrl } = this.state;
 		if (imageUrl === prevImage) return alert('Enter New Image URL');
-		fetch('http://localhost:3000/imageurl', {
+		fetch('https://quiet-sierra-25784.herokuapp.com/imageurl', {
 			method: 'post',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				imageUrl: file ? { base64: file } : imageUrl
+				// imageUrl: file ? { base64: file } : imageUrl
+				imageUrl
 			})
 		})
 			.then((response) => response.json())
@@ -143,6 +145,7 @@ class App extends Component {
 	onRouteChange = (route) => {
 		if (route === 'signin') {
 			this.setState(initialState);
+			prevImage = '';
 		} else if (route === 'home') {
 			this.setState({
 				isSignedIn: true
