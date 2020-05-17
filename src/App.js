@@ -7,27 +7,28 @@ import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import SignIn from './components/SignIn/SignIn';
 import Register from './components/Register/Register';
 import Particles from 'react-particles-js';
-import { particlesOptions } from './apis/particles';
-import detectFaces from './apis/clarifai';
+import { particlesOptions } from './assets/particles';
 import './App.css';
 
-class App extends Component {
-	state = {
-		input: '',
-		imageUrl: '',
-		boxes: [],
-		route: 'signin',
-		isSignedIn: false,
-		user: {
-			id: '',
-			name: '',
-			email: '',
-			entries: 0,
-			joined: ''
-		}
-	};
+const initialState = {
+	imageUrl: '',
+	file: '',
+	boxes: [],
+	route: 'signin',
+	isSignedIn: false,
+	user: {
+		id: '',
+		name: '',
+		email: '',
+		entries: 0,
+		joined: ''
+	}
+};
 
-	initialState = { ...this.state };
+let prevImage = '';
+
+class App extends Component {
+	state = initialState;
 
 	loadUser = (user) => {
 		this.setState({
@@ -66,7 +67,14 @@ class App extends Component {
 			})
 		})
 			.then((response) => response.json())
-			.then((entries) => this.setState(Object.assign(this.state.user, { entries })))
+			.then((entries) =>
+				this.setState({
+					user: {
+						...this.state.user,
+						entries
+					}
+				})
+			)
 			.catch(console.log);
 	};
 
@@ -76,23 +84,64 @@ class App extends Component {
 
 	onInputChange = (event) => {
 		this.setState({
-			input: event.target.value
+			imageUrl: event.target.value,
+			boxes: []
 		});
 	};
 
-	onPictureSubmit = () => {
-		this.setState(
-			{
-				imageUrl: this.state.input
+	onFileUpload = (event) => {
+		const file = event.target.files[0];
+		let blob = '';
+		let trimmedBlob = '';
+
+		const reader = new FileReader();
+		reader.addEventListener(
+			'load',
+			() => {
+				// convert image file to base64 string
+				blob = reader.result;
+				trimmedBlob = blob.replace(/^data:image\/(.*);base64,/, '');
+
+				this.setState({
+					imageUrl: blob,
+					file: trimmedBlob,
+					boxes: []
+				});
 			},
-			() =>
-				detectFaces(this.state.imageUrl, this.calculateFaceLocation, this.displayFaceBox, this.calculateEntries)
+			false
 		);
+
+		if (file) {
+			reader.readAsDataURL(file);
+		}
+	};
+
+	onPictureSubmit = () => {
+		const { imageUrl, file } = this.state;
+		if (imageUrl === prevImage) return window.alert('Enter New Image URL');
+		fetch('http://localhost:3000/imageurl', {
+			method: 'post',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				imageUrl: file ? { base64: file } : imageUrl
+			})
+		})
+			.then((response) => response.json())
+			.then((data) => {
+				if (data.outputs[0]) {
+					this.calculateEntries();
+					this.displayFaceBox(this.calculateFaceLocation(data));
+					prevImage = imageUrl;
+				} else {
+					throw Error('Face detection API not responding');
+				}
+			})
+			.catch(console.log);
 	};
 
 	onRouteChange = (route) => {
 		if (route === 'signin') {
-			this.setState(this.initialState);
+			this.setState(initialState);
 		} else if (route === 'home') {
 			this.setState({
 				isSignedIn: true
@@ -114,7 +163,11 @@ class App extends Component {
 					<React.Fragment>
 						<Logo />
 						<Rank user={this.state.user} />
-						<ImageLinkForm onInputChange={this.onInputChange} onPictureSubmit={this.onPictureSubmit} />
+						<ImageLinkForm
+							onFileUpload={this.onFileUpload}
+							onInputChange={this.onInputChange}
+							onPictureSubmit={this.onPictureSubmit}
+						/>
 						<FaceRecognition boxes={this.state.boxes} imageUrl={this.state.imageUrl} />
 					</React.Fragment>
 				);

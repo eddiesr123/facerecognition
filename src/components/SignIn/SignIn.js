@@ -2,19 +2,13 @@ import React, { Component } from 'react';
 
 class SignIn extends Component {
 	state = {
-		signInEmail: '',
-		signInPassword: ''
+		email: '',
+		password: ''
 	};
 
-	onEmailChange = (event) => {
+	onInputChange = (event) => {
 		this.setState({
-			signInEmail: event.target.value
-		});
-	};
-
-	onPasswordChange = (event) => {
-		this.setState({
-			signInPassword: event.target.value
+			[event.target.name]: event.target.value
 		});
 	};
 
@@ -23,8 +17,8 @@ class SignIn extends Component {
 			method: 'post',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				email: this.state.signInEmail,
-				password: this.state.signInPassword
+				email: this.state.email,
+				password: this.state.password
 			})
 		})
 			.then((response) => response.json())
@@ -33,7 +27,8 @@ class SignIn extends Component {
 					this.props.loadUser(user);
 					this.props.onRouteChange('home');
 				}
-			});
+			})
+			.catch(console.log);
 	};
 
 	render() {
@@ -50,9 +45,9 @@ class SignIn extends Component {
 								<input
 									className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
 									type="email"
-									name="email-address"
-									id="email-address"
-									onChange={this.onEmailChange}
+									name="email"
+									id="email"
+									onChange={this.onInputChange}
 								/>
 							</div>
 							<div className="mv3">
@@ -64,7 +59,7 @@ class SignIn extends Component {
 									type="password"
 									name="password"
 									id="password"
-									onChange={this.onPasswordChange}
+									onChange={this.onInputChange}
 								/>
 							</div>
 						</fieldset>

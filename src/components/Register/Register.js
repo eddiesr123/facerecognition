@@ -7,44 +7,30 @@ class Register extends Component {
 		password: ''
 	};
 
-	onNameChange = (event) => {
+	onInputChange = (event) => {
 		this.setState({
-			name: event.target.value
+			[event.target.name]: event.target.value
 		});
 	};
 
-	onEmailChange = (event) => {
-		this.setState({
-			email: event.target.value
-		});
-	};
-
-	onPasswordChange = (event) => {
-		this.setState({
-			password: event.target.value
-		});
-	};
-
-	onRegisterChange = ({ name, email, password }) => {
-		if (name && email && password) {
-			fetch('http://localhost:3000/register', {
-				method: 'post',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					name,
-					email,
-					password
-				})
+	onRegisterChange = () => {
+		fetch('http://localhost:3000/register', {
+			method: 'post',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				name: this.state.name,
+				email: this.state.email,
+				password: this.state.password
 			})
-				.then((response) => response.json())
-				.then((user) => {
-					if (user.id) {
-						this.props.loadUser(user);
-						this.props.onRouteChange('home');
-					}
-				})
-				.catch(console.log);
-		}
+		})
+			.then((response) => response.json())
+			.then((user) => {
+				if (user.id) {
+					this.props.loadUser(user);
+					this.props.onRouteChange('home');
+				}
+			})
+			.catch(console.log);
 	};
 
 	render() {
@@ -63,7 +49,7 @@ class Register extends Component {
 									type="text"
 									name="name"
 									id="name"
-									onChange={this.onNameChange}
+									onChange={this.onInputChange}
 								/>
 							</div>
 							<div className="mt3">
@@ -73,9 +59,9 @@ class Register extends Component {
 								<input
 									className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
 									type="email"
-									name="email-address"
-									id="email-address"
-									onChange={this.onEmailChange}
+									name="email"
+									id="email"
+									onChange={this.onInputChange}
 								/>
 							</div>
 							<div className="mv3">
@@ -87,14 +73,14 @@ class Register extends Component {
 									type="password"
 									name="password"
 									id="password"
-									onChange={this.onPasswordChange}
+									onChange={this.onInputChange}
 								/>
 							</div>
 						</fieldset>
 						<div className="">
 							<input
 								className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"
-								onClick={() => this.onRegisterChange(this.state)}
+								onClick={this.onRegisterChange}
 								type="submit"
 								value="Register"
 							/>
