@@ -13,12 +13,18 @@ const ImageLinkForm = ({ onInputChange, onPictureSubmit, onFileUpload }) => {
 						onChange={onInputChange}
 						placeholder="Enter Image URL"
 					/>
+					{/* Image file feature functional but slow will implement once I solve performance issue */}
+					{/* <input
+						style={{ zIndex: 1, position: 'absolute', marginTop: '38px', marginLeft: '66px' }}
+						className="f6 pa2 w-50 center"
+						type="file"
+						onChange={onFileUpload}
+					/> */}
 					<button className="w-30 grow f4 link ph3 pv2 dib white bg-light-purple" onClick={onPictureSubmit}>
 						Detect
 					</button>
 				</div>
 			</div>
-			<input className="f6 pa2 w-auto" type="file" onChange={onFileUpload} />
 		</div>
 	);
 };

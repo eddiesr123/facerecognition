@@ -12,7 +12,7 @@ import './App.css';
 
 const initialState = {
 	imageUrl: '',
-	file: '',
+	// file: '', //state property for Image FIle feature
 	boxes: [],
 	route: 'signin',
 	isSignedIn: false,
@@ -89,36 +89,37 @@ class App extends Component {
 		});
 	};
 
-	onFileUpload = (event) => {
-		const file = event.target.files[0];
-		let blob = '';
-		let trimmedBlob = '';
+	// Image file feature functional but slow will implement once I solve performance issue
+	// onFileUpload = (event) => {
+	// 	const file = event.target.files[0];
+	// 	let blob = '';
+	// 	let trimmedBlob = '';
 
-		const reader = new FileReader();
-		reader.addEventListener(
-			'load',
-			() => {
-				// convert image file to base64 string
-				blob = reader.result;
-				trimmedBlob = blob.replace(/^data:image\/(.*);base64,/, '');
+	// 	const reader = new FileReader();
+	// 	reader.addEventListener(
+	// 		'load',
+	// 		() => {
+	// 			// convert image file to base64 string
+	// 			blob = reader.result;
+	// 			trimmedBlob = blob.replace(/^data:image\/(.*);base64,/, '');
 
-				this.setState({
-					imageUrl: blob,
-					file: trimmedBlob,
-					boxes: []
-				});
-			},
-			false
-		);
+	// 			this.setState({
+	// 				imageUrl: blob,
+	// 				file: trimmedBlob,
+	// 				boxes: []
+	// 			});
+	// 		},
+	// 		false
+	// 	);
 
-		if (file) {
-			reader.readAsDataURL(file);
-		}
-	};
+	// 	if (file) {
+	// 		reader.readAsDataURL(file);
+	// 	}
+	// };
 
 	onPictureSubmit = () => {
 		const { imageUrl, file } = this.state;
-		if (imageUrl === prevImage) return window.alert('Enter New Image URL');
+		if (imageUrl === prevImage) return alert('Enter New Image URL');
 		fetch('http://localhost:3000/imageurl', {
 			method: 'post',
 			headers: { 'Content-Type': 'application/json' },
@@ -164,7 +165,7 @@ class App extends Component {
 						<Logo />
 						<Rank user={this.state.user} />
 						<ImageLinkForm
-							onFileUpload={this.onFileUpload}
+							// onFileUpload={this.onFileUpload} Method for Image File feature
 							onInputChange={this.onInputChange}
 							onPictureSubmit={this.onPictureSubmit}
 						/>
